@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Juego de potencias (-a)^n, a^n y -a^n</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Configuración de MathJax para LaTeX -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)'], ['$', '$']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script"
+            async
+            src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+    </script>
+
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a, #1d4ed8);
+            --card-bg: #0b1120;
+            --accent: #38bdf8;
+            --accent-soft: rgba(56, 189, 248, 0.15);
+            --error: #f97373;
+            --success: #4ade80;
+            --text-main: #e5e7eb;
+            --text-muted: #9ca3af;
+            --border-soft: rgba(148, 163, 184, 0.4);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: var(--bg-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            color: var(--text-main);
+        }
+
+        .container {
+            max-width: 980px;
+            width: 100%;
+            background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 55%),
+                        radial-gradient(circle at bottom right, rgba(129, 140, 248, 0.12), transparent 55%),
+                        var(--card-bg);
+            border-radius: 24px;
+            padding: 26px 26px 28px;
+            box-shadow: 0 30px 80px rgba(15,23,42,0.9);
+            border: 1px solid rgba(148, 163, 184, 0.35);
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .title-block {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        h1 {
+            font-size: 1.7rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 3px 9px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.7);
+            background: rgba(15,23,42,0.9);
+            color: var(--accent);
+        }
+
+        .subtitle {
+            margin: 0;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .stats {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .chip {
+            display: flex;
+            flex-direction: column;
+            padding: 6px 10px;
+            border-radius: 12px;
+            border: 1px solid var(--border-soft);
+            background: rgba(15,23,42,0.88);
+            min-width: 80px;
+        }
+
+        .chip-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+        }
+
+        .chip-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .game-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr);
+            gap: 18px;
+        }
+
+        @media (max-width: 880px) {
+            .game-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: rgba(15,23,42,0.92);
+            border-radius: 18px;
+            padding: 14px 16px 16px;
+            border: 1px solid var(--border-soft);
+            box-shadow: 0 14px 40px rgba(15,23,42,0.85);
+        }
+
+        .card h2 {
+            margin: 0 0 6px;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card h2 span.icon {
+            font-size: 1.2rem;
+        }
+
+        .card p {
+            margin: 0 0 8px;
+            font-size: 0.83rem;
+            color: var(--text-muted);
+        }
+
+        .expression-card {
+            margin-bottom: 10px;
+            padding: 14px 16px;
+            border-radius: 16px;
+            background: radial-gradient(circle at top left, var(--accent-soft), transparent 60%);
+            border: 1px solid rgba(56, 189, 248, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .expression-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--accent);
+        }
+
+        .expression-display {
+            font-size: 1.8rem;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .expression-type {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+            text-align: right;
+        }
+
+        .question-block {
+            margin-top: 8px;
+            padding: 8px 10px 10px;
+            border-radius: 14px;
+            background: rgba(15,23,42,0.9);
+            border: 1px dashed rgba(148,163,184,0.55);
+        }
+
+        .question-title {
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .options-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .pill-option {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 11px;
+            border-radius: 999px;
+            border: 1px solid rgba(148,163,184,0.6);
+            cursor: pointer;
+            font-size: 0.85rem;
+            user-select: none;
+            background: rgba(15,23,42,0.96);
+            transition: transform 0.08s ease, box-shadow 0.08s ease, border-color 0.1s ease, background 0.1s ease;
+        }
+
+        .pill-option:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(15,23,42,0.9);
+            border-color: var(--accent);
+        }
+
+        .pill-option input {
+            display: none;
+        }
+
+        .pill-option span.dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            border: 2px solid rgba(148,163,184,0.8);
+        }
+
+        .pill-option span.label {
+            position: relative;
+            top: 1px;
+        }
+
+        .pill-option input:checked + span.dot {
+            border-color: var(--accent);
+            background: var(--accent);
+        }
+
+        .pill-option input:checked ~ span.label {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .value-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .value-input-row input[type="text"] {
+            padding: 7px 9px;
+            border-radius: 10px;
+            border: 1px solid rgba(148,163,184,0.7);
+            background: rgba(15,23,42,0.95);
+            color: var(--text-main);
+            font-size: 0.9rem;
+            max-width: 140px;
+        }
+
+        .value-input-row input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px rgba(56,189,248,0.4);
+        }
+
+        .hint {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+        }
+
+        .explanations-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .explanation-option {
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 7px 9px;
+            border-radius: 12px;
+            border: 1px solid rgba(148,163,184,0.6);
+            cursor: pointer;
+            background: rgba(15,23,42,0.96);
+            font-size: 0.82rem;
+            transition: border-color 0.08s ease, transform 0.08s ease, box-shadow 0.08s ease, background 0.1s ease;
+        }
+
+        .explanation-option:hover {
+            border-color: var(--accent);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(15,23,42,0.9);
+        }
+
+        .explanation-option input {
+            margin-top: 2px;
+        }
+
+        .explanation-option span.text {
+            flex: 1;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        button {
+            font-family: inherit;
+            cursor: pointer;
+            border-radius: 999px;
+            padding: 7px 14px;
+            font-size: 0.9rem;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: transform 0.08sease, box-shadow 0.08s ease, background 0.1s ease;
+        }
+
+        button:disabled {
+            opacity: 0.45;
+            cursor: default;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: rgba(15,23,42,0.96);
+            color: var(--text-main);
+            border: 1px solid rgba(148,163,184,0.7);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(15,23,42,0.9);
+            border-color: var(--accent);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #38bdf8, #6366f1);
+            color: white;
+            box-shadow: 0 10px 22px rgba(37, 99, 235, 0.6);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 30px rgba(37, 99, 235, 0.85);
+        }
+
+        .feedback {
+            margin-top: 10px;
+            padding: 8px 10px;
+            border-radius: 14px;
+            background: rgba(15,23,42,0.9);
+            border: 1px solid rgba(148,163,184,0.6);
+            font-size: 0.82rem;
+        }
+
+        .feedback-main {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .feedback-main span.icon {
+            font-size: 1.1rem;
+        }
+
+        .feedback-main span.text {
+            font-weight: 500;
+        }
+
+        .feedback-list {
+            margin: 0;
+            padding-left: 15px;
+        }
+
+        .feedback-list li {
+            margin: 1px 0;
+        }
+
+        .tag-ok {
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        .tag-error {
+            color: var(--error);
+            font-weight: 500;
+        }
+
+        .tiny {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="title-block">
+            <h1>
+                Potencias con \((-a)^n\), \(a^n\) y \(-a^n\)
+                <span class="badge">2.º ESO</span>
+            </h1>
+            <p class="subtitle">
+                \(a\) y \(n\) son números enteros. Verás potencias con paréntesis \((-a)^n\),
+                sin paréntesis \(a^n\) y con signo fuera \(-a^n\).
+            </p>
+        </div>
+        <div class="stats">
+            <div class="chip">
+                <span class="chip-label">Pregunta</span>
+                <span class="chip-value" id="questionNumber">1</span>
+            </div>
+            <div class="chip">
+                <span class="chip-label">Aciertos totales</span>
+                <span class="chip-value" id="score">0</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="game-layout">
+        <!-- Columna izquierda -->
+        <div class="card">
+            <h2><span class="icon">🧮</span> Reto de potencias</h2>
+            <p>Observa la potencia y responde a las preguntas.</p>
+
+            <div class="expression-card">
+                <div>
+                    <div class="expression-label">Expresión</div>
+                    <div class="expression-display" id="expressionDisplay">
+                        \((-3)^2\)
+                    </div>
+                    <div class="expression-type" id="expressionType">
+                        a y n son números enteros.
+                    </div>
+                </div>
+                <div>
+                    <div class="chip" style="padding: 4px 8px; min-width: auto;">
+                        <span class="chip-label">Forma</span>
+                        <span class="chip-value" id="baseInfo" style="font-size: 0.9rem;">
+                            \((-a)^n\)
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <div class="question-title">1. ¿El exponente \(n\) es par o impar?</div>
+                <div class="options-row">
+                    <label class="pill-option">
+                        <input type="radio" name="parity" value="par">
+                        <span class="dot"></span>
+                        <span class="label">Par</span>
+                    </label>
+                    <label class="pill-option">
+                        <input type="radio" name="parity" value="impar">
+                        <span class="dot"></span>
+                        <span class="label">Impar</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <div class="question-title">2. Signo de la potencia</div>
+                <div class="options-row">
+                    <label class="pill-option">
+                        <input type="radio" name="sign" value="positivo">
+                        <span class="dot"></span>
+                        <span class="label">Positiva</span>
+                    </label>
+                    <label class="pill-option">
+                        <input type="radio" name="sign" value="negativo">
+                        <span class="dot"></span>
+                        <span class="label">Negativa</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <div class="question-title">3. Valor de la potencia</div>
+                <div class="value-input-row">
+                    <input type="text" id="valueInput" placeholder="Ej: -8   o   -1/8">
+                    <span class="hint">Puedes escribir entero, fracción (1/8) o decimal (0.125).</span>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn-secondary" id="newQuestionBtn">🔁 Nueva pregunta</button>
+                <button class="btn-primary" id="checkBtn">✅ Comprobar</button>
+            </div>
+
+            <div id="feedback" class="feedback" style="display:none;"></div>
+            <div class="tiny">
+                Creador del juego: Sergio Jodral. Profesor de matemáticas.
+            </div>
+        </div>
+
+        <!-- Columna derecha: explicaciones -->
+        <div class="card">
+            <h2><span class="icon">💡</span> Explicación del signo</h2>
+            <p>
+                Elige la explicación que mejor justifica si la potencia es positiva o negativa.
+                Fíjate en el signo de la base, en si hay paréntesis y en si \(n\) es par o impar.
+            </p>
+
+            <div id="explanations" class="explanations-list">
+                <!-- Rellenado con JS -->
+            </div>
+
+            <p class="hint" style="margin-top: 10px;">
+                Pista: No es lo mismo \((-2)^4\) que \(-2^4\) ni \(3^2\) que \(3^{-2}\).
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const expressionDisplay = document.getElementById("expressionDisplay");
+    const expressionType = document.getElementById("expressionType");
+    const baseInfo = document.getElementById("baseInfo");
+    const questionNumberSpan = document.getElementById("questionNumber");
+    const scoreSpan = document.getElementById("score");
+    const explanationsDiv = document.getElementById("explanations");
+    const feedbackDiv = document.getElementById("feedback");
+    const valueInput = document.getElementById("valueInput");
+    const checkBtn = document.getElementById("checkBtn");
+    const newQuestionBtn = document.getElementById("newQuestionBtn");
+
+    let score = 0;
+    let questionsAnswered = 0;
+    let gameOver = false;
+    let currentQuestionChecked = false;
+
+    // currentQuestion: { a, n, kind, result, resultDisplay, parity, sign, explanationType }
+    let currentQuestion = null;
+
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function refreshMath() {
+        if (window.MathJax && window.MathJax.typesetPromise) {
+            MathJax.typesetPromise();
+        }
+    }
+
+    function formatResult(a, n, result) {
+        if (n > 0) {
+            const rounded = Math.round(result);
+            return String(rounded);
+        } else {
+            const absN = Math.abs(n);
+            const denom = Math.pow(a, absN);
+            const sign = result < 0 ? "-" : "";
+            return sign + "1/" + denom;
+        }
+    }
+
+    function generateQuestion() {
+        if (gameOver) return;
+
+        currentQuestionChecked = false;
+        feedbackDiv.style.display = "none";
+        feedbackDiv.innerHTML = "";
+
+        const a = randomInt(1, 5); // 1..5
+        const nOptions = [-3, -2, -1, 1, 2, 3]; // sin 0
+        const n = nOptions[randomInt(0, nOptions.length - 1)];
+
+        const kinds = ["parenNeg", "plainPos", "minusOutside"]; // (-a)^n, a^n, -a^n
+        const kind = kinds[randomInt(0, kinds.length - 1)];
+
+        let exprLatex, typeLatex, result;
+        const absN = Math.abs(n);
+        const parity = (absN % 2 === 0) ? "par" : "impar";
+
+        if (kind === "parenNeg") {
+            exprLatex = `\\((-` + a + `)^{` + n + `}\\)`;
+            typeLatex = `\\((-a)^n\\)`;
+            result = Math.pow(-a, n);
+        } else if (kind === "plainPos") {
+            exprLatex = `\\(` + a + `^{` + n + `}\\)`;
+            typeLatex = `\\(a^n\\)`;
+            result = Math.pow(a, n);
+        } else { // minusOutside
+            exprLatex = `\\(-` + a + `^{` + n + `}\\)`;
+            typeLatex = `\\(-a^n\\)`;
+            result = -Math.pow(a, n);
+        }
+
+        const sign = (result > 0) ? "positivo" : "negativo";
+        const resultDisplay = formatResult(a, n, result);
+
+        currentQuestion = {
+            a,
+            n,
+            kind,
+            result,
+            resultDisplay,
+            parity,
+            sign,
+            explanationType: getExplanationType(kind, parity)
+        };
+
+        expressionDisplay.textContent = exprLatex;
+        baseInfo.textContent = typeLatex;
+        expressionType.textContent = "a y n son números enteros.";
+
+        clearRadios("parity");
+        clearRadios("sign");
+        clearRadios("explanation");
+        valueInput.value = "";
+
+        explanationsDiv.innerHTML = "";
+        generateExplanationOptions(currentQuestion.explanationType);
+
+        questionNumberSpan.textContent = questionsAnswered + 1;
+
+        checkBtn.disabled = false;
+
+        refreshMath();
+    }
+
+    function clearRadios(name) {
+        const radios = document.querySelectorAll(`input[name="${name}"]`);
+        radios.forEach(r => r.checked = false);
+    }
+
+    function getExplanationType(kind, parity) {
+        if (kind === "plainPos") return "positive_base";
+        if (kind === "minusOutside") return "minus_outside";
+        // (-a)^n
+        return parity === "par" ? "neg_base_even" : "neg_base_odd";
+    }
+
+    function generateExplanationOptions(type) {
+        const options = [];
+
+        if (type === "positive_base") {
+            options.push({
+                correct: true,
+                text: "La base es positiva, por eso la potencia \\(a^n\\) es positiva para cualquier exponente entero \\(n\\)."
+            });
+            options.push({
+                correct: false,
+                text: "La base es positiva y el exponente es impar, por eso el resultado de \\(a^n\\) es negativo."
+            });
+            options.push({
+                correct: false,
+                text: "Cuando la base es positiva, el resultado es negativo si el exponente \\(n\\) es par."
+            });
+        } else if (type === "neg_base_even") {
+            options.push({
+                correct: true,
+                text: "La base es negativa y el exponente es par. En \\((-a)^n\\) el resultado es positivo."
+            });
+            options.push({
+                correct: false,
+                text: "La base es negativa y el exponente es par, por eso \\((-a)^n\\) es negativo."
+            });
+            options.push({
+                correct: false,
+                text: "Si la base es negativa, la potencia \\((-a)^n\\) siempre es negativa, sea cual sea \\(n\\)."
+            });
+        } else if (type === "neg_base_odd") {
+            options.push({
+                correct: true,
+                text: "La base es negativa y el exponente es impar, por eso \\((-a)^n\\) es negativo."
+            });
+            options.push({
+                correct: false,
+                text: "La base es negativa y el exponente es impar, por eso \\((-a)^n\\) es positivo."
+            });
+            options.push({
+                correct: false,
+                text: "Cuando el exponente es impar, el resultado de la potencia siempre es positivo, tenga la base el signo que tenga."
+            });
+        } else if (type === "minus_outside") {
+            options.push({
+                correct: true,
+                text: "El signo menos está fuera de la potencia: primero se calcula \\(a^n\\), que es positivo, y luego se pone el signo menos delante. Por eso el resultado es negativo."
+            });
+            options.push({
+                correct: false,
+                text: "El signo menos está dentro de la potencia, así que si \\(n\\) es par el resultado es positivo y si es impar es negativo."
+            });
+            options.push({
+                correct: false,
+                text: "Como la base es negativa, el signo cambia según si \\(n\\) es par o impar, igual que en \\((-a)^n\\)."
+            });
+        }
+
+        // Barajamos
+        for (let i = options.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [options[i], options[j]] = [options[j], options[i]];
+        }
+
+        options.forEach((opt, index) => {
+            const id = "exp_opt_" + index;
+            const wrapper = document.createElement("label");
+            wrapper.className = "explanation-option";
+            wrapper.htmlFor = id;
+
+            const input = document.createElement("input");
+            input.type = "radio";
+            input.name = "explanation";
+            input.id = id;
+            input.value = opt.correct ? "correct" : "incorrect";
+
+            const textSpan = document.createElement("span");
+            textSpan.className = "text";
+            textSpan.innerHTML = opt.text;
+
+            wrapper.appendChild(input);
+            wrapper.appendChild(textSpan);
+            explanationsDiv.appendChild(wrapper);
+        });
+
+        refreshMath();
+    }
+
+    function getSelectedRadioValue(name) {
+        const radio = document.querySelector(`input[name="${name}"]:checked`);
+        return radio ? radio.value : null;
+    }
+
+    // Permite "3", "-2.5", "1/8", "-1/8", con coma o punto
+    function parseUserNumber(input) {
+        let txt = input.replace(",", ".").trim();
+        if (txt === "") return NaN;
+
+        if (txt.includes("/")) {
+            const parts = txt.split("/");
+            if (parts.length !== 2) return NaN;
+            const num = parseFloat(parts[0]);
+            const den = parseFloat(parts[1]);
+            if (!isFinite(num) || !isFinite(den) || den === 0) return NaN;
+            return num / den;
+        }
+
+        const value = parseFloat(txt);
+        if (!isFinite(value)) return NaN;
+        return value;
+    }
+
+    function checkAnswer() {
+        if (!currentQuestion || gameOver) return;
+        if (currentQuestionChecked) return; // evitar contar dos veces la misma pregunta
+
+        const selectedParity = getSelectedRadioValue("parity");
+        const selectedSign = getSelectedRadioValue("sign");
+        const selectedExplanation = getSelectedRadioValue("explanation");
+
+        const userValueRaw = valueInput.value.trim();
+        const userValueNumeric = parseUserNumber(userValueRaw);
+
+        if (!selectedParity || !selectedSign || selectedExplanation === null ||
+            userValueRaw === "" || isNaN(userValueNumeric)) {
+            feedbackDiv.innerHTML = "";
+            const mainWarn = document.createElement("div");
+            mainWarn.className = "feedback-main";
+            mainWarn.innerHTML = `<span class="icon">⚠️</span><span class="text">Responde a todas las partes y escribe un valor válido (entero, fracción o decimal).</span>`;
+            feedbackDiv.appendChild(mainWarn);
+            feedbackDiv.style.display = "block";
+            return;
+        }
+
+        currentQuestionChecked = true;
+        questionsAnswered++;
+
+        const correctParity = (selectedParity === currentQuestion.parity);
+        const correctSign = (selectedSign === currentQuestion.sign);
+        const correctValue = Math.abs(userValueNumeric - currentQuestion.result) < 1e-9;
+        const correctExplanation = (selectedExplanation === "correct");
+
+        feedbackDiv.innerHTML = "";
+
+        const main = document.createElement("div");
+        main.className = "feedback-main";
+
+        const iconSpan = document.createElement("span");
+        iconSpan.className = "icon";
+
+        const textSpan = document.createElement("span");
+        textSpan.className = "text";
+
+        if (correctParity && correctSign && correctValue && correctExplanation) {
+            iconSpan.textContent = "🎉";
+            textSpan.textContent = "¡Perfecto! Has contestado todo correctamente.";
+            score++;
+            scoreSpan.textContent = score;
+        } else {
+            iconSpan.textContent = "✨";
+            textSpan.textContent = "Buen intento. Revisa en qué puntos te has equivocado.";
+        }
+
+        main.appendChild(iconSpan);
+        main.appendChild(textSpan);
+        feedbackDiv.appendChild(main);
+
+        const list = document.createElement("ul");
+        list.className = "feedback-list";
+
+        const liParity = document.createElement("li");
+        liParity.innerHTML = `Exponente par/impar: ${
+            correctParity ? '<span class="tag-ok">correcto</span>' :
+                `<span class="tag-error">incorrecto</span> (n = ${currentQuestion.n} es ${currentQuestion.parity}).`
+        }`;
+        list.appendChild(liParity);
+
+        const liSign = document.createElement("li");
+        liSign.innerHTML = `Signo de la potencia: ${
+            correctSign ? '<span class="tag-ok">correcto</span>' :
+                `<span class="tag-error">incorrecto</span> (el resultado es ${currentQuestion.sign}).`
+        }`;
+        list.appendChild(liSign);
+
+        const liValue = document.createElement("li");
+        liValue.innerHTML = `Valor numérico: ${
+            correctValue ? '<span class="tag-ok">correcto</span>' :
+                `<span class="tag-error">incorrecto</span> (el resultado correcto es ${currentQuestion.resultDisplay}).`
+        }`;
+        list.appendChild(liValue);
+
+        const liExplanation = document.createElement("li");
+        liExplanation.innerHTML = `Explicación elegida: ${
+            correctExplanation ? '<span class="tag-ok">correcta</span>' :
+                '<span class="tag-error">incorrecta</span>.'
+        }`;
+        list.appendChild(liExplanation);
+
+        feedbackDiv.appendChild(list);
+        feedbackDiv.style.display = "block";
+
+        // Si ya ha respondido a 10 preguntas, fin del juego
+        if (questionsAnswered >= 10) {
+            gameOver = true;
+            checkBtn.disabled = true;
+            newQuestionBtn.disabled = true;
+
+            const finalMsg = document.createElement("p");
+            finalMsg.style.marginTop = "6px";
+            finalMsg.innerHTML = `<strong>Has completado las 10 preguntas.</strong> Aciertos: ${score} de 10.`;
+            feedbackDiv.appendChild(finalMsg);
+
+            questionNumberSpan.textContent = "10";
+        }
+    }
+
+    checkBtn.addEventListener("click", checkAnswer);
+
+    newQuestionBtn.addEventListener("click", () => {
+        if (gameOver) return;
+        generateQuestion();
+    });
+
+    // Primera pregunta
+    generateQuestion();
+</script>
+</body>
+</html>
